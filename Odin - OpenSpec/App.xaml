@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Application
+    x:Class="Odin___OpenSpec.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Odin___OpenSpec">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+                
+                <!-- Theme Resource Dictionaries -->
+                <ResourceDictionary Source="Themes/Common.xaml" />
+                <ResourceDictionary>
+                    <ResourceDictionary.ThemeDictionaries>
+                        <ResourceDictionary x:Key="Light" Source="Themes/Light.xaml" />
+                        <ResourceDictionary x:Key="Dark" Source="Themes/Dark.xaml" />
+                    </ResourceDictionary.ThemeDictionaries>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
