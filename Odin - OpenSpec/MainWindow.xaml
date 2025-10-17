@@ -14,22 +14,112 @@
     </Window.SystemBackdrop>
 
     <Grid>
-        <Border Style="{StaticResource ContentAreaStyle}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Navigation Sidebar -->
+        <Border Grid.Column="0"
+                Background="{ThemeResource SystemControlBackgroundChromeMediumBrush}"
+                BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}"
+                BorderThickness="0,0,1,0">
+            <StackPanel Padding="16" Spacing="8">
+                <TextBlock Text="Navigation" 
+                          Style="{StaticResource SubheadingTextBlockStyle}" 
+                          Margin="0,0,0,12" />
+                
+                <Button x:Name="HomeButton"
+                        Content="Home" 
+                        Style="{StaticResource TouchButtonStyle}"
+                        HorizontalAlignment="Stretch"
+                        Click="NavigationButton_Click"
+                        Tag="Home" />
+                
+                <Button x:Name="CalendarButton"
+                        Content="Calendar" 
+                        Style="{StaticResource TouchButtonStyle}"
+                        HorizontalAlignment="Stretch"
+                        Click="NavigationButton_Click"
+                        Tag="Calendar" />
+                
+                <Button x:Name="TasksButton"
+                        Content="Tasks" 
+                        Style="{StaticResource TouchButtonStyle}"
+                        HorizontalAlignment="Stretch"
+                        Click="NavigationButton_Click"
+                        Tag="Tasks" />
+                
+                <Button x:Name="GroceryButton"
+                        Content="Grocery" 
+                        Style="{StaticResource TouchButtonStyle}"
+                        HorizontalAlignment="Stretch"
+                        Click="NavigationButton_Click"
+                        Tag="Grocery" />
+                
+                <Button x:Name="WeatherButton"
+                        Content="Weather" 
+                        Style="{StaticResource TouchButtonStyle}"
+                        HorizontalAlignment="Stretch"
+                        Click="NavigationButton_Click"
+                        Tag="Weather" />
+                
+                <Button x:Name="MusicButton"
+                        Content="Music" 
+                        Style="{StaticResource TouchButtonStyle}"
+                        HorizontalAlignment="Stretch"
+                        Click="NavigationButton_Click"
+                        Tag="Music" />
+                
+                <Button x:Name="SettingsButton"
+                        Content="Settings" 
+                        Style="{StaticResource TouchButtonStyle}"
+                        HorizontalAlignment="Stretch"
+                        Click="NavigationButton_Click"
+                        Tag="Settings"
+                        Margin="0,24,0,0" />
+            </StackPanel>
+        </Border>
+
+        <!-- Main Content Area -->
+        <Border Grid.Column="1" Style="{StaticResource ContentAreaStyle}">
             <StackPanel Spacing="16">
-                <TextBlock Text="Odin - OpenSpec" 
+                <TextBlock x:Name="ContentTitle"
+                          Text="Odin - OpenSpec" 
                           Style="{StaticResource HeadingTextBlockStyle}" />
                 
-                <TextBlock Text="Theme System Test" 
+                <TextBlock Text="Task 6: Navigation Sidebar - In Progress" 
                           Style="{StaticResource SubheadingTextBlockStyle}" />
                 
                 <Border Style="{StaticResource CardBorderStyle}">
                     <StackPanel Spacing="12">
-                        <TextBlock Text="Welcome to your personal productivity hub!" 
+                        <TextBlock x:Name="ContentMessage"
+                                  Text="Welcome to your personal productivity hub!" 
                                   Style="{StaticResource BodyTextBlockStyle}" />
                         
                         <Button Content="Toggle Theme" 
                                Style="{StaticResource TouchButtonStyle}"
                                Click="ToggleThemeButton_Click" />
+                    </StackPanel>
+                </Border>
+                
+                <Border Style="{StaticResource CardBorderStyle}">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Navigation Sidebar Features:" 
+                                  Style="{StaticResource BodyTextBlockStyle}"
+                                  FontWeight="SemiBold" />
+                        <TextBlock Text="✅ Static navigation layout with module buttons" 
+                                  Style="{StaticResource BodyTextBlockStyle}" />
+                        <TextBlock Text="✅ Touch-friendly button sizing (44px minimum)" 
+                                  Style="{StaticResource BodyTextBlockStyle}" />
+                        <TextBlock Text="✅ Module selection handling" 
+                                  Style="{StaticResource BodyTextBlockStyle}" />
+                        <TextBlock Text="⏳ Expand/collapse animations" 
+                                  Style="{StaticResource BodyTextBlockStyle}" />
+                        <TextBlock Text="⏳ Touch gesture support" 
+                                  Style="{StaticResource BodyTextBlockStyle}" />
+                        <TextBlock Text="⏳ Navigation state persistence" 
+                                  Style="{StaticResource BodyTextBlockStyle}" />
                     </StackPanel>
                 </Border>
             </StackPanel>
