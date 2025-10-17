@@ -9,14 +9,8 @@
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
                 
-                <!-- Theme Resource Dictionaries -->
+                <!-- Common Resource Dictionary -->
                 <ResourceDictionary Source="Themes/Common.xaml" />
-                <ResourceDictionary>
-                    <ResourceDictionary.ThemeDictionaries>
-                        <ResourceDictionary x:Key="Light" Source="Themes/Light.xaml" />
-                        <ResourceDictionary x:Key="Dark" Source="Themes/Dark.xaml" />
-                    </ResourceDictionary.ThemeDictionaries>
-                </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

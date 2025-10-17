@@ -208,137 +208,53 @@
         </Border>
 
         <!-- Main Content Area -->
-        <Grid Grid.Column="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            
-            <!-- Header -->
-            <Border Grid.Row="0"
-                    Background="{ThemeResource SystemControlBackgroundChromeMediumBrush}"
-                    BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}"
-                    BorderThickness="0,0,0,1"
-                    Padding="24,12">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    
-                    <!-- User Profile Section -->
-                    <StackPanel Grid.Column="0" 
-                               Orientation="Horizontal" 
-                               Spacing="12"
-                               VerticalAlignment="Center">
-                        <PersonPicture x:Name="UserProfilePicture"
-                                      Initials="U"
-                                      DisplayName="User"
-                                      Width="40"
-                                      Height="40" />
+        <Border Grid.Column="1" Style="{StaticResource ContentAreaStyle}">
+            <StackPanel Spacing="16">
+                <TextBlock x:Name="ContentTitle"
+                          Text="Odin - OpenSpec" 
+                          Style="{StaticResource HeadingTextBlockStyle}" />
+                
+                <TextBlock Text="Task 6: Navigation Sidebar - In Progress" 
+                          Style="{StaticResource SubheadingTextBlockStyle}" />
+                
+                <Border Style="{StaticResource CardBorderStyle}">
+                    <StackPanel Spacing="12">
+                        <TextBlock x:Name="ContentMessage"
+                                  Text="Welcome to your personal productivity hub!" 
+                                  Style="{StaticResource BodyTextBlockStyle}" />
                         
-                        <StackPanel VerticalAlignment="Center" Spacing="2">
-                            <TextBlock x:Name="UserDisplayName"
-                                      Text="User"
-                                      FontSize="14"
-                                      FontWeight="SemiBold" />
-                            <TextBlock x:Name="UserProfileSubtext"
-                                      Text="Main Profile"
-                                      FontSize="12"
-                                      Opacity="0.7" />
-                        </StackPanel>
-                        
-                        <Button x:Name="ProfileSwitcherButton"
-                               Content="&#xE2AC;"
-                               FontFamily="Segoe MDL2 Assets"
-                               FontSize="12"
-                               Width="32"
-                               Height="32"
-                               Padding="0"
-                               Background="Transparent"
-                               BorderThickness="0"
-                               VerticalAlignment="Center"
-                               ToolTipService.ToolTip="Switch Profile">
-                            <Button.Resources>
-                                <ResourceDictionary>
-                                    <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="{ThemeResource SystemAccentColor}" Opacity="0.1" />
-                                    <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="{ThemeResource SystemAccentColor}" Opacity="0.2" />
-                                </ResourceDictionary>
-                            </Button.Resources>
-                        </Button>
+                        <Button Content="Toggle Theme" 
+                               Style="{StaticResource TouchButtonStyle}"
+                               Click="ToggleThemeButton_Click" />
                     </StackPanel>
-                    
-                    <!-- Dynamic Content Title -->
-                    <TextBlock x:Name="HeaderContentTitle"
-                              Grid.Column="1"
-                              Text="Home"
-                              FontSize="20"
-                              FontWeight="SemiBold"
-                              HorizontalAlignment="Center"
-                              VerticalAlignment="Center" />
-                    
-                    <!-- Theme and Settings Controls -->
-                    <StackPanel Grid.Column="2" 
-                               Orientation="Horizontal" 
-                               Spacing="8"
-                               VerticalAlignment="Center">
-                        
-                        <!-- Theme Switcher -->
-                        <ComboBox x:Name="ThemeSwitcher"
-                                 Width="140"
-                                 Height="40"
-                                 SelectedIndex="0"
-                                 SelectionChanged="ThemeSwitcher_SelectionChanged"
-                                 ToolTipService.ToolTip="Change Theme">
-                            <ComboBoxItem Content="🌞 Light" Tag="Light" />
-                            <ComboBoxItem Content="🌙 Dark" Tag="Dark" />
-                            <ComboBoxItem Content="🖥️ System" Tag="Default" />
-                        </ComboBox>
-                        
-                        <!-- Settings Button -->
-                        <Button x:Name="HeaderSettingsButton"
-                               Content="&#xE713;"
-                               FontFamily="Segoe MDL2 Assets"
-                               FontSize="16"
-                               Width="44"
-                               Height="44"
-                               Padding="0"
-                               Background="Transparent"
-                               BorderThickness="0"
-                               Click="NavigationButton_Click"
-                               Tag="Settings"
-                               ToolTipService.ToolTip="Settings">
-                            <Button.Resources>
-                                <ResourceDictionary>
-                                    <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="{ThemeResource SystemAccentColor}" Opacity="0.1" />
-                                    <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="{ThemeResource SystemAccentColor}" Opacity="0.2" />
-                                </ResourceDictionary>
-                            </Button.Resources>
-                        </Button>
+                </Border>
+                
+                <Border Style="{StaticResource CardBorderStyle}">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Navigation Sidebar Features:" 
+                                  Style="{StaticResource BodyTextBlockStyle}"
+                                  FontWeight="SemiBold" />
+                        <TextBlock Text="✅ Static navigation layout with module buttons" 
+                                  Style="{StaticResource BodyTextBlockStyle}" />
+                        <TextBlock Text="✅ Touch-friendly button sizing (44px minimum)" 
+                                  Style="{StaticResource BodyTextBlockStyle}" />
+                        <TextBlock Text="✅ Module selection handling with visual states" 
+                                  Style="{StaticResource BodyTextBlockStyle}" />
+                        <TextBlock Text="✅ Expand/collapse animations (200ms CubicEase)" 
+                                  Style="{StaticResource BodyTextBlockStyle}" />
+                        <TextBlock Text="✅ Collapsed sidebar with icon-only navigation" 
+                                  Style="{StaticResource BodyTextBlockStyle}" />
+                        <TextBlock Text="✅ Smooth width transitions (250px ↔ 60px)" 
+                                  Style="{StaticResource BodyTextBlockStyle}" />
+                        <TextBlock Text="✅ Touch gesture support (swipe from edge)" 
+                                  Style="{StaticResource BodyTextBlockStyle}" />
+                        <TextBlock Text="✅ Navigation state persistence in SQLite" 
+                                  Style="{StaticResource BodyTextBlockStyle}" />
+                        <TextBlock Text="⏳ Keyboard navigation support (Tab + arrows)" 
+                                  Style="{StaticResource BodyTextBlockStyle}" />
                     </StackPanel>
-                </Grid>
-            </Border>
-            
-            <!-- Content Area -->
-            <Border Grid.Row="1" Style="{StaticResource ContentAreaStyle}">
-                <StackPanel Spacing="16">
-                    <TextBlock x:Name="ContentTitle"
-                              Text="Odin - OpenSpec" 
-                              Style="{StaticResource HeadingTextBlockStyle}" />
-                    
-                    <TextBlock Text="Task 7: Header Implementation - In Progress" 
-                              Style="{StaticResource SubheadingTextBlockStyle}" />
-                    
-                    <Border Style="{StaticResource CardBorderStyle}">
-                        <StackPanel Spacing="12">
-                            <TextBlock x:Name="ContentMessage"
-                                      Text="Welcome to your personal productivity hub!" 
-                                      Style="{StaticResource BodyTextBlockStyle}" />
-                        </StackPanel>
-                    </Border>
-                </StackPanel>
-            </Border>
-        </Grid>
+                </Border>
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>

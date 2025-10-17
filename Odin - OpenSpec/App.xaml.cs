@@ -92,24 +92,33 @@ namespace Odin___OpenSpec
         /// <param name="args">Details about the launch request and process.</param>
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
-            _window = new MainWindow();
-            
-            // Initialize database
-            _ = Task.Run(async () =>
+            try
             {
-                try
+                _window = new MainWindow();
+                
+                // Initialize database
+                _ = Task.Run(async () =>
                 {
-                    var dataContext = ServiceProvider.GetRequiredService<IDataContext>();
-                    await dataContext.InitializeAsync();
-                }
-                catch (Exception ex)
-                {
-                    // Log error - in production this should be handled appropriately
-                    System.Diagnostics.Debug.WriteLine($"Database initialization failed: {ex.Message}");
-                }
-            });
-            
-            _window.Activate();
+                    try
+                    {
+                        var dataContext = ServiceProvider.GetRequiredService<IDataContext>();
+                        await dataContext.InitializeAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        // Log error - in production this should be handled appropriately
+                        System.Diagnostics.Debug.WriteLine($"Database initialization failed: {ex.Message}");
+                    }
+                });
+                
+                _window.Activate();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"OnLaunched failed: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
+                throw;
+            }
         }
     }
 }
