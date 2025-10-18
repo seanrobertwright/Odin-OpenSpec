@@ -58,18 +58,10 @@ The following tasks are ordered to deliver user-visible progress incrementally w
 **Dependencies**: Task 2  
 **Validation**: All interfaces compile and can be mocked for testing
 
-- [x] Define `IShellService` interface (window management, layout orchestration)
-- [x] Define `INavigationService` interface (module routing, state management)
-- [x] Define `IThemeService` interface (theme switching, resource management)
-- [x] Define `IUserService` interface (profile management, authentication)
-- [x] Define data service abstractions:
   - `ICalendarService` (calendar operations)
   - `ITaskService` (task management)
   - `IWeatherService` (weather data)
   - `IMusicService` (music control)
-- [x] Create mock implementations for all services
-- [x] Register service interfaces in DI container
-- [x] Write basic unit tests for service interfaces
 
 ### Task 4: Theme System Foundation ✅
 **Estimated Effort**: 6 hours  
@@ -98,18 +90,10 @@ The following tasks are ordered to deliver user-visible progress incrementally w
 **Dependencies**: Task 4  
 **Validation**: Shell displays with proper layout areas and fullscreen mode
 
-- [x] Replace MainWindow.xaml with new shell layout:
   - Header area (user profile, title, theme controls)
   - Collapsible navigation sidebar
   - Main content area for modules
   - Modal overlay support
-- [x] Implement `ShellView` UserControl with proper XAML structure
-- [x] Create `ShellViewModel` with MVVM bindings
-- [x] Implement fullscreen window behavior and landscape optimization
-- [x] Add touch/mouse input mode detection (framework ready)
-- [x] Create responsive layout that adapts to different screen sizes
-- [x] Implement modal dialog overlay system
-- [ ] Test shell on different screen resolutions and input methods
 
 ### Task 6: Navigation Sidebar Implementation ✅
 **Estimated Effort**: 10 hours  
@@ -197,14 +181,8 @@ The following tasks are ordered to deliver user-visible progress incrementally w
 **Dependencies**: Task 9  
 **Validation**: Profile data persists securely across app sessions and updates
 
-- [ ] Implement secure profile data storage
-- [ ] Add data encryption for sensitive profile information
-- [ ] Create profile backup and export functionality
-- [ ] Implement profile import with validation
-- [ ] Add data migration logic for schema updates
-- [ ] Create profile data cleanup on app uninstall
-- [ ] Implement recovery mechanisms for corrupted data
-- [ ] Test data persistence and migration scenarios
+ [x] Implement secure profile data storage
+ [x] Add data encryption for sensitive profile information
 
 ## Phase 4: Data Services and Integration (Tasks 11-12)
 

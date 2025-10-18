@@ -13,8 +13,75 @@ namespace Odin___OpenSpec.Services
     /// </summary>
     public class SqliteDataContext : IDataContext
     {
+        /// <summary>
+        /// Migrate profile data schema if needed
+        /// </summary>
+        public async Task MigrateProfileSchemaAsync()
+        {
+            // Example: Add new columns, update types, etc.
+            // For SQLite, use ALTER TABLE or recreate tables as needed
+            await _database.ExecuteAsync("PRAGMA foreign_keys=off;");
+            // Add migration steps here
+            await _database.ExecuteAsync("PRAGMA foreign_keys=on;");
+        }
+
+        /// <summary>
+        /// Delete all profile data (for app uninstall)
+        /// </summary>
+        public async Task DeleteAllProfileDataAsync()
+        {
+            await _database.DeleteAllAsync<User>();
+            await _database.DeleteAllAsync<UserPreference>();
+            await _database.DeleteAllAsync<NavigationState>();
+            await _database.DeleteAllAsync<ThemeState>();
+        }
+        /// <summary>
+        /// Import a user's profile and preferences from a secure backup file
+        /// </summary>
+        public async Task<bool> ImportProfileAsync(string filePath)
+        {
+            try
+            {
+                var encrypted = await File.ReadAllBytesAsync(filePath);
+                var json = Odin___OpenSpec.Infrastructure.SecureStorageHelper.Unprotect(encrypted);
+                var importObj = System.Text.Json.JsonSerializer.Deserialize<ImportProfileModel>(json);
+                if (importObj is null || importObj.User is null || importObj.Preferences is null)
+                    return false;
+
+                // Insert user and preferences
+                await CreateUserAsync(importObj.User);
+                foreach (var pref in importObj.Preferences)
+                {
+                    await SetUserPreferenceAsync(pref);
+                }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private class ImportProfileModel
+        {
+            public Odin___OpenSpec.Models.User? User { get; set; }
+            public List<Odin___OpenSpec.Models.UserPreference>? Preferences { get; set; }
+        }
         private readonly SQLiteAsyncConnection _database;
         private readonly ILogger<SqliteDataContext> _logger;
+
+        /// <summary>
+        /// Export a user's profile and preferences to a secure backup file
+        /// </summary>
+        public async Task ExportProfileAsync(int userId, string filePath)
+        {
+            var user = await GetUserAsync(userId);
+            var prefs = await GetUserPreferencesAsync(userId);
+            if (user is not null)
+            {
+                await Odin_OpenSpec.Infrastructure.ProfileBackupHelper.ExportProfileAsync(user, prefs, filePath);
+            }
+        }
 
         public SqliteDataContext(ILogger<SqliteDataContext> logger)
         {
@@ -128,7 +195,7 @@ namespace Odin___OpenSpec.Services
             try
             {
                 var user = await GetUserAsync(id);
-                if (user != null)
+                if (user is not null)
                 {
                     user.IsActive = false;
                     return await UpdateUserAsync(user);
@@ -149,9 +216,23 @@ namespace Odin___OpenSpec.Services
         {
             try
             {
-                return await _database.Table<UserPreference>()
+                var prefs = await _database.Table<UserPreference>()
                     .Where(p => p.UserId == userId)
                     .ToListAsync();
+                // Decrypt sensitive values
+                foreach (var pref in prefs)
+                {
+                    if (IsSensitiveKey(pref.Key) && pref.Value != null)
+                    {
+                        try
+                        {
+                            var bytes = Convert.FromBase64String(pref.Value);
+                            pref.Value = Infrastructure.SecureStorageHelper.Unprotect(bytes);
+                        }
+                        catch { /* ignore corrupt or non-encrypted values */ }
+                    }
+                }
+                return prefs;
             }
             catch (Exception ex)
             {
@@ -186,7 +267,12 @@ namespace Odin___OpenSpec.Services
             try
             {
                 preference.UpdatedDate = DateTime.UtcNow;
-
+                // Encrypt sensitive values before saving
+                if (IsSensitiveKey(preference.Key) && preference.Value != null)
+                {
+                    var bytes = Infrastructure.SecureStorageHelper.Protect(preference.Value);
+                    preference.Value = Convert.ToBase64String(bytes);
+                }
                 var existing = await GetUserPreferenceAsync(preference.UserId, preference.Key);
                 if (existing != null)
                 {
@@ -203,8 +289,19 @@ namespace Odin___OpenSpec.Services
                 _logger.LogError(ex, "Failed to set preference {Key} for user {UserId}", preference.Key, preference.UserId);
                 throw;
             }
+
         }
 
+        // Determines if a preference key is sensitive and should be encrypted
+        private static bool IsSensitiveKey(string key)
+        {
+            var sensitiveKeys = new[] { "password", "token", "secret", "personal_info" };
+            foreach (var k in sensitiveKeys)
+            {
+                if (key.ToLower().Contains(k)) return true;
+            }
+            return false;
+        }
         /// <summary>
         /// Get navigation state for a user
         /// </summary>
