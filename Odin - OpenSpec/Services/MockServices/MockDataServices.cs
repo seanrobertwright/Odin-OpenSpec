@@ -450,27 +450,174 @@ namespace Odin___OpenSpec.Services.MockServices
         public MockDataServices()
         {
             // Initialize mock data
+            var today = DateTime.Today;
+            
             _events = new List<CalendarEvent>
             {
+                // Today's events
                 new CalendarEvent
                 {
                     Id = "1",
                     Title = "Team Meeting",
                     Description = "Weekly team sync",
-                    StartTime = DateTime.Today.AddHours(10),
-                    EndTime = DateTime.Today.AddHours(11),
+                    StartTime = today.AddHours(10),
+                    EndTime = today.AddHours(11),
                     Location = "Conference Room A",
-                    SourceId = "work"
+                    SourceId = "work",
+                    Attendees = new List<string> { "Alice", "Bob", "Carol" }
                 },
                 new CalendarEvent
                 {
                     Id = "2",
+                    Title = "Lunch with Sarah",
+                    Description = "Catch up over lunch",
+                    StartTime = today.AddHours(12).AddMinutes(30),
+                    EndTime = today.AddHours(13).AddMinutes(30),
+                    Location = "Downtown Cafe",
+                    SourceId = "personal"
+                },
+                new CalendarEvent
+                {
+                    Id = "3",
+                    Title = "Code Review",
+                    Description = "Review PR #145",
+                    StartTime = today.AddHours(14),
+                    EndTime = today.AddHours(15),
+                    Location = "Teams Call",
+                    SourceId = "work"
+                },
+                new CalendarEvent
+                {
+                    Id = "4",
+                    Title = "Gym Session",
+                    Description = "Leg day workout",
+                    StartTime = today.AddHours(18),
+                    EndTime = today.AddHours(19),
+                    Location = "Fitness Center",
+                    SourceId = "personal"
+                },
+                
+                // Tomorrow's events
+                new CalendarEvent
+                {
+                    Id = "5",
                     Title = "Doctor Appointment",
                     Description = "Annual checkup",
-                    StartTime = DateTime.Today.AddDays(1).AddHours(14),
-                    EndTime = DateTime.Today.AddDays(1).AddHours(15),
+                    StartTime = today.AddDays(1).AddHours(14),
+                    EndTime = today.AddDays(1).AddHours(15),
                     Location = "Medical Center",
                     SourceId = "personal"
+                },
+                new CalendarEvent
+                {
+                    Id = "6",
+                    Title = "Client Presentation",
+                    Description = "Q4 Product Demo",
+                    StartTime = today.AddDays(1).AddHours(10),
+                    EndTime = today.AddDays(1).AddHours(11).AddMinutes(30),
+                    Location = "Main Conference Room",
+                    SourceId = "work",
+                    Attendees = new List<string> { "Client Team", "Sales Team" }
+                },
+                
+                // This week
+                new CalendarEvent
+                {
+                    Id = "7",
+                    Title = "Sprint Planning",
+                    Description = "Plan next sprint tasks",
+                    StartTime = today.AddDays(3).AddHours(9),
+                    EndTime = today.AddDays(3).AddHours(11),
+                    Location = "Conference Room B",
+                    SourceId = "work"
+                },
+                new CalendarEvent
+                {
+                    Id = "8",
+                    Title = "Dentist Appointment",
+                    Description = "Teeth cleaning",
+                    StartTime = today.AddDays(4).AddHours(16),
+                    EndTime = today.AddDays(4).AddHours(17),
+                    Location = "Dental Clinic",
+                    SourceId = "personal"
+                },
+                new CalendarEvent
+                {
+                    Id = "9",
+                    Title = "Team Lunch",
+                    Description = "Monthly team bonding",
+                    StartTime = today.AddDays(5).AddHours(12),
+                    EndTime = today.AddDays(5).AddHours(13).AddMinutes(30),
+                    Location = "Italian Restaurant",
+                    SourceId = "work",
+                    IsAllDay = false
+                },
+                
+                // Next week
+                new CalendarEvent
+                {
+                    Id = "10",
+                    Title = "Project Deadline",
+                    Description = "Submit final deliverables",
+                    StartTime = today.AddDays(7).AddHours(17),
+                    EndTime = today.AddDays(7).AddHours(18),
+                    Location = "",
+                    SourceId = "work"
+                },
+                new CalendarEvent
+                {
+                    Id = "11",
+                    Title = "Coffee with Alex",
+                    Description = "Networking meetup",
+                    StartTime = today.AddDays(8).AddHours(15),
+                    EndTime = today.AddDays(8).AddHours(16),
+                    Location = "Starbucks Downtown",
+                    SourceId = "personal"
+                },
+                new CalendarEvent
+                {
+                    Id = "12",
+                    Title = "Board Meeting",
+                    Description = "Quarterly review",
+                    StartTime = today.AddDays(10).AddHours(9),
+                    EndTime = today.AddDays(10).AddHours(12),
+                    Location = "Executive Boardroom",
+                    SourceId = "work",
+                    Attendees = new List<string> { "Board Members", "Executive Team" }
+                },
+                new CalendarEvent
+                {
+                    Id = "13",
+                    Title = "Birthday Party",
+                    Description = "Emma's birthday celebration",
+                    StartTime = today.AddDays(12).AddHours(18),
+                    EndTime = today.AddDays(12).AddHours(21),
+                    Location = "Community Center",
+                    SourceId = "personal"
+                },
+                
+                // All-day events
+                new CalendarEvent
+                {
+                    Id = "14",
+                    Title = "Conference Attendance",
+                    Description = "Tech Summit 2025",
+                    StartTime = today.AddDays(14).Date,
+                    EndTime = today.AddDays(14).Date.AddDays(1).AddMinutes(-1),
+                    Location = "Convention Center",
+                    SourceId = "work",
+                    IsAllDay = true
+                },
+                new CalendarEvent
+                {
+                    Id = "15",
+                    Title = "Vacation Day",
+                    Description = "Personal day off",
+                    StartTime = today.AddDays(21).Date,
+                    EndTime = today.AddDays(21).Date.AddDays(1).AddMinutes(-1),
+                    Location = "",
+                    SourceId = "personal",
+                    IsAllDay = true
                 }
             };
 

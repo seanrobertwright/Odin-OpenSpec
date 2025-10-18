@@ -59,6 +59,31 @@ namespace Odin___OpenSpec
             }
         }
 
+        /// <summary>
+        /// Restores user session after app initialization - called from App.xaml.cs
+        /// </summary>
+        public async System.Threading.Tasks.Task RestoreUserSessionAsync()
+        {
+            try
+            {
+                var app = Application.Current as App;
+                var userService = app?.ServiceProvider?.GetService(typeof(IUserService)) as IUserService;
+
+                if (userService?.CurrentUser != null)
+                {
+                    // Update UI with current user
+                    await UpdateProfileDisplayAsync(userService.CurrentUser);
+                    
+                    // Restore navigation state for this user
+                    await LoadNavigationStateAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error restoring user session: {ex.Message}");
+            }
+        }
+
         private void SetupGestureHandlers()
         {
             // TODO: Gesture handlers temporarily disabled - need to find the correct Grid element
@@ -205,15 +230,26 @@ namespace Odin___OpenSpec
                 var selectedItem = ThemeSwitcher.SelectedItem as ComboBoxItem;
                 if (selectedItem?.Tag is string themeTag)
                 {
-                    // Map ElementTheme to ApplicationTheme
-                    Microsoft.UI.Xaml.ApplicationTheme appTheme = themeTag switch
+                    if (themeTag == "Default")
                     {
-                        "Light" => Microsoft.UI.Xaml.ApplicationTheme.Light,
-                        "Dark" => Microsoft.UI.Xaml.ApplicationTheme.Dark,
-                        _ => Microsoft.UI.Xaml.ApplicationTheme.Light // Default fallback
-                    };
-            
-                    await _themeService.SetThemeAsync(appTheme);
+                        // System/Default theme - follow system preference
+                        await _themeService.SetFollowSystemThemeAsync(true);
+                    }
+                    else
+                    {
+                        // Specific theme selected
+                        Microsoft.UI.Xaml.ApplicationTheme appTheme = themeTag switch
+                        {
+                            "Light" => Microsoft.UI.Xaml.ApplicationTheme.Light,
+                            "Dark" => Microsoft.UI.Xaml.ApplicationTheme.Dark,
+                            _ => Microsoft.UI.Xaml.ApplicationTheme.Light
+                        };
+                
+                        await _themeService.SetThemeAsync(appTheme);
+                    }
+                    
+                    // Force refresh of current content to apply theme
+                    UpdateContentArea(_currentModule);
                 }
             }
             catch (Exception ex)
@@ -375,37 +411,510 @@ namespace Odin___OpenSpec
 
         private void UpdateContentArea(string moduleId)
         {
-            // Update content based on selected module
-            ContentTitle.Text = $"{moduleId} Module";
-            HeaderContentTitle.Text = moduleId;  // Update header title too
+            // Update header title
+            HeaderContentTitle.Text = moduleId;
             
+            // Navigate to appropriate view
             switch (moduleId)
             {
                 case "Home":
-                    ContentMessage.Text = "Welcome to your personal productivity hub!";
+                    ContentFrame.Content = CreateHomePlaceholder();
                     break;
                 case "Calendar":
-                    ContentMessage.Text = "View and manage your calendar events and appointments.";
+                    ContentFrame.Content = new Views.CalendarView();
                     break;
                 case "Tasks":
-                    ContentMessage.Text = "Track your to-do lists and tasks.";
+                    ContentFrame.Content = CreatePlaceholder("Tasks", "Track your to-do lists and tasks.");
                     break;
                 case "Grocery":
-                    ContentMessage.Text = "Manage your grocery lists and shopping needs.";
+                    ContentFrame.Content = CreatePlaceholder("Grocery", "Manage your grocery lists and shopping needs.");
                     break;
                 case "Weather":
-                    ContentMessage.Text = "Check current weather conditions and forecasts.";
+                    ContentFrame.Content = CreatePlaceholder("Weather", "Check current weather conditions and forecasts.");
                     break;
                 case "Music":
-                    ContentMessage.Text = "Control your music playback and playlists.";
+                    ContentFrame.Content = CreatePlaceholder("Music", "Control your music playback and playlists.");
                     break;
                 case "Settings":
-                    ContentMessage.Text = "Configure application preferences and settings.";
+                    ContentFrame.Content = CreatePlaceholder("Settings", "Configure application preferences and settings.");
                     break;
                 default:
-                    ContentMessage.Text = "Module not found.";
+                    ContentFrame.Content = CreatePlaceholder("Unknown", "Module not found.");
                     break;
             }
+        }
+
+        private UIElement CreateHomePlaceholder()
+        {
+            var stackPanel = new StackPanel
+            {
+                Spacing = 24,
+                Padding = new Thickness(24)
+            };
+
+            var title = new TextBlock
+            {
+                Text = "Welcome to Odin - OpenSpec",
+                FontSize = 32,
+                FontWeight = Microsoft.UI.Text.FontWeights.Bold
+            };
+            stackPanel.Children.Add(title);
+
+            var subtitle = new TextBlock
+            {
+                Text = "Your personal productivity hub",
+                FontSize = 18,
+                Opacity = 0.7
+            };
+            stackPanel.Children.Add(subtitle);
+
+            var description = new TextBlock
+            {
+                Text = "Select a module from the navigation sidebar to get started.\n\nAvailable modules:\n• Calendar - View and manage events\n• Tasks - Track your to-do lists\n• Settings - Configure preferences",
+                FontSize = 16,
+                Opacity = 0.8,
+                TextWrapping = Microsoft.UI.Xaml.TextWrapping.Wrap,
+                Margin = new Thickness(0, 16, 0, 0)
+            };
+            stackPanel.Children.Add(description);
+
+            return stackPanel;
+        }
+
+        private UIElement CreatePlaceholder(string title, string message)
+        {
+            var stackPanel = new StackPanel
+            {
+                Spacing = 16,
+                Padding = new Thickness(24),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+
+            var titleText = new TextBlock
+            {
+                Text = title,
+                FontSize = 28,
+                FontWeight = Microsoft.UI.Text.FontWeights.Bold,
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
+            stackPanel.Children.Add(titleText);
+
+            var messageText = new TextBlock
+            {
+                Text = message + "\n\nThis module is coming soon!",
+                FontSize = 16,
+                Opacity = 0.7,
+                TextWrapping = Microsoft.UI.Xaml.TextWrapping.Wrap,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                TextAlignment = Microsoft.UI.Xaml.TextAlignment.Center
+            };
+            stackPanel.Children.Add(messageText);
+
+            return stackPanel;
+        }
+
+        private async void ProfileSwitcherButton_Click(object sender, RoutedEventArgs e)
+        {
+            // This method is no longer needed - flyout handles the click
+            // Keeping for backward compatibility but can be removed
+        }
+
+        private async void ProfileSwitcherFlyout_Opening(object sender, object e)
+        {
+            try
+            {
+                var app = Application.Current as App;
+                var userService = app?.ServiceProvider?.GetService(typeof(IUserService)) as IUserService;
+
+                if (userService == null) return;
+
+                // Get all users
+                var users = await userService.GetUsersAsync();
+                var currentUserId = userService.CurrentUser?.Id ?? 0;
+
+                // Remove old dynamic profile items (items between the two separators)
+                var itemsToRemove = new List<MenuFlyoutItemBase>();
+                var startRemoving = false;
+                
+                foreach (var item in ProfileSwitcherFlyout.Items)
+                {
+                    if (item == ProfileListSeparator)
+                    {
+                        startRemoving = true;
+                        continue;
+                    }
+                    
+                    // Stop at the second separator (before Edit/Delete)
+                    if (startRemoving && item is MenuFlyoutSeparator)
+                    {
+                        break;
+                    }
+                    
+                    if (startRemoving)
+                    {
+                        itemsToRemove.Add(item);
+                    }
+                }
+
+                foreach (var item in itemsToRemove)
+                {
+                    ProfileSwitcherFlyout.Items.Remove(item);
+                }
+
+                // Show/hide separator based on whether we have users
+                ProfileListSeparator.Visibility = users.Any() ? Visibility.Visible : Visibility.Collapsed;
+
+                // Add profile items
+                var insertIndex = ProfileSwitcherFlyout.Items.IndexOf(ProfileListSeparator) + 1;
+                
+                foreach (var user in users)
+                {
+                    var menuItem = new MenuFlyoutItem
+                    {
+                        Text = user.Name,
+                        Tag = user.Id
+                    };
+
+                    // Add checkmark icon if this is the current user
+                    if (user.Id == currentUserId)
+                    {
+                        menuItem.Icon = new FontIcon { Glyph = "\uE73E" }; // Checkmark
+                    }
+
+                    menuItem.Click += ProfileMenuItem_Click;
+                    ProfileSwitcherFlyout.Items.Insert(insertIndex++, menuItem);
+                }
+
+                // Enable/disable Edit and Delete based on whether there's a current user
+                EditProfileMenuItem.IsEnabled = currentUserId > 0;
+                DeleteProfileMenuItem.IsEnabled = currentUserId > 0 && users.Count() > 1; // Don't allow deleting last profile
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error populating profile menu: {ex.Message}");
+            }
+        }
+
+        private async void ProfileMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is MenuFlyoutItem menuItem && menuItem.Tag is int userId)
+                {
+                    var app = Application.Current as App;
+                    var userService = app?.ServiceProvider?.GetService(typeof(IUserService)) as IUserService;
+
+                    if (userService == null) return;
+
+                    // Don't switch if already current user
+                    if (userService.CurrentUser?.Id == userId)
+                        return;
+
+                    // Save current user's navigation state before switching
+                    await SaveNavigationStateAsync();
+
+                    // Switch to the selected user
+                    await userService.SetCurrentUserAsync(userId);
+                    
+                    var user = userService.CurrentUser;
+                    if (user != null)
+                    {
+                        // Update profile display
+                        await UpdateProfileDisplayAsync(user);
+                        
+                        // Restore navigation state for new user
+                        await LoadNavigationStateAsync();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error switching profile: {ex.Message}");
+                
+                var errorDialog = new ContentDialog
+                {
+                    Title = "Error",
+                    Content = $"Failed to switch profile: {ex.Message}",
+                    CloseButtonText = "OK",
+                    XamlRoot = this.Content.XamlRoot
+                };
+                await errorDialog.ShowAsync();
+            }
+        }
+
+        private async void CreateProfile_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // Create and show profile dialog
+                var dialog = new Views.CreateProfileDialog
+                {
+                    XamlRoot = this.Content.XamlRoot
+                };
+
+                var result = await dialog.ShowAsync();
+
+                if (result == ContentDialogResult.Primary)
+                {
+                    // Get service for creating user
+                    var app = Application.Current as App;
+                    var userService = app?.ServiceProvider?.GetService(typeof(IUserService)) as IUserService;
+
+                    if (userService != null)
+                    {
+                        // Create the profile
+                        var user = await userService.CreateUserAsync(dialog.UserName, dialog.PhotoPath);
+
+                        if (user != null)
+                        {
+                            // Set as current user
+                            await userService.SetCurrentUserAsync(user.Id);
+
+                            // Update UI
+                            await UpdateProfileDisplayAsync(user);
+
+                            // Show success message
+                            var successDialog = new ContentDialog
+                            {
+                                Title = "Profile Created",
+                                Content = $"Welcome, {dialog.UserName}!",
+                                CloseButtonText = "OK",
+                                XamlRoot = this.Content.XamlRoot
+                            };
+                            await successDialog.ShowAsync();
+                        }
+                        else
+                        {
+                            // Show error
+                            var errorDialog = new ContentDialog
+                            {
+                                Title = "Error",
+                                Content = "Failed to create profile. Please try again.",
+                                CloseButtonText = "OK",
+                                XamlRoot = this.Content.XamlRoot
+                            };
+                            await errorDialog.ShowAsync();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error creating profile: {ex.Message}");
+                
+                var errorDialog = new ContentDialog
+                {
+                    Title = "Error",
+                    Content = $"An error occurred: {ex.Message}",
+                    CloseButtonText = "OK",
+                    XamlRoot = this.Content.XamlRoot
+                };
+                await errorDialog.ShowAsync();
+            }
+        }
+
+        private async void EditProfile_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var app = Application.Current as App;
+                var userService = app?.ServiceProvider?.GetService(typeof(IUserService)) as IUserService;
+
+                if (userService?.CurrentUser == null)
+                {
+                    var errorDialog = new ContentDialog
+                    {
+                        Title = "Error",
+                        Content = "No active profile to edit.",
+                        CloseButtonText = "OK",
+                        XamlRoot = this.Content.XamlRoot
+                    };
+                    await errorDialog.ShowAsync();
+                    return;
+                }
+
+                var currentUser = userService.CurrentUser;
+                var dialog = new Views.EditProfileDialog(currentUser)
+                {
+                    XamlRoot = this.Content.XamlRoot
+                };
+
+                var result = await dialog.ShowAsync();
+
+                if (result == ContentDialogResult.Primary)
+                {
+                    // Update user
+                    currentUser.Name = dialog.UserName;
+                    
+                    if (dialog.PhotoChanged)
+                    {
+                        await userService.SetUserPhotoAsync(currentUser.Id, dialog.PhotoPath ?? string.Empty);
+                        currentUser.PhotoPath = dialog.PhotoPath;
+                    }
+                    
+                    await userService.UpdateUserAsync(currentUser);
+
+                    // Update UI
+                    await UpdateProfileDisplayAsync(currentUser);
+
+                    // Show success message
+                    var successDialog = new ContentDialog
+                    {
+                        Title = "Profile Updated",
+                        Content = "Your profile has been updated successfully.",
+                        CloseButtonText = "OK",
+                        XamlRoot = this.Content.XamlRoot
+                    };
+                    await successDialog.ShowAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error editing profile: {ex.Message}");
+                
+                var errorDialog = new ContentDialog
+                {
+                    Title = "Error",
+                    Content = $"An error occurred: {ex.Message}",
+                    CloseButtonText = "OK",
+                    XamlRoot = this.Content.XamlRoot
+                };
+                await errorDialog.ShowAsync();
+            }
+        }
+
+        private async void DeleteProfile_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var app = Application.Current as App;
+                var userService = app?.ServiceProvider?.GetService(typeof(IUserService)) as IUserService;
+
+                if (userService?.CurrentUser == null)
+                {
+                    return;
+                }
+
+                // Confirm deletion
+                var confirmDialog = new ContentDialog
+                {
+                    Title = "Delete Profile",
+                    Content = $"Are you sure you want to delete the profile '{userService.CurrentUser.Name}'?\n\nThis action cannot be undone.",
+                    PrimaryButtonText = "Delete",
+                    CloseButtonText = "Cancel",
+                    DefaultButton = ContentDialogButton.Close,
+                    XamlRoot = this.Content.XamlRoot
+                };
+
+                var result = await confirmDialog.ShowAsync();
+
+                if (result == ContentDialogResult.Primary)
+                {
+                    var userIdToDelete = userService.CurrentUser.Id;
+                    var photoPath = userService.CurrentUser.PhotoPath;
+                    
+                    // Delete the profile
+                    await userService.DeleteUserAsync(userIdToDelete);
+
+                    // Delete photo if exists
+                    if (!string.IsNullOrEmpty(photoPath) && File.Exists(photoPath))
+                    {
+                        try
+                        {
+                            File.Delete(photoPath);
+                        }
+                        catch
+                        {
+                            // Ignore photo deletion errors
+                        }
+                    }
+
+                    // Switch to another profile or create default
+                    var users = await userService.GetUsersAsync();
+                    if (users.Any())
+                    {
+                        var nextUser = users.First();
+                        await userService.SetCurrentUserAsync(nextUser.Id);
+                        await UpdateProfileDisplayAsync(nextUser);
+                    }
+                    else
+                    {
+                        // No users left - reset to default
+                        UserDisplayName.Text = "User";
+                        UserProfilePicture.Initials = "U";
+                        UserProfilePicture.DisplayName = "User";
+                        UserProfilePicture.ProfilePicture = null;
+                    }
+
+                    // Show success message
+                    var successDialog = new ContentDialog
+                    {
+                        Title = "Profile Deleted",
+                        Content = "The profile has been deleted successfully.",
+                        CloseButtonText = "OK",
+                        XamlRoot = this.Content.XamlRoot
+                    };
+                    await successDialog.ShowAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error deleting profile: {ex.Message}");
+                
+                var errorDialog = new ContentDialog
+                {
+                    Title = "Error",
+                    Content = $"An error occurred: {ex.Message}",
+                    CloseButtonText = "OK",
+                    XamlRoot = this.Content.XamlRoot
+                };
+                await errorDialog.ShowAsync();
+            }
+        }
+
+        private async System.Threading.Tasks.Task UpdateProfileDisplayAsync(Models.User user)
+        {
+            UserDisplayName.Text = user.Name;
+            
+            // Load photo if available
+            if (!string.IsNullOrEmpty(user.PhotoPath) && File.Exists(user.PhotoPath))
+            {
+                try
+                {
+                    var file = await Windows.Storage.StorageFile.GetFileFromPathAsync(user.PhotoPath);
+                    using var stream = await file.OpenAsync(Windows.Storage.FileAccessMode.Read);
+                    var bitmapImage = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage();
+                    await bitmapImage.SetSourceAsync(stream);
+                    UserProfilePicture.ProfilePicture = bitmapImage;
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Failed to load profile photo: {ex.Message}");
+                    // Fall back to initials
+                    UserProfilePicture.Initials = GetInitials(user.Name);
+                }
+            }
+            else
+            {
+                // Clear photo and show initials
+                UserProfilePicture.ProfilePicture = null;
+                UserProfilePicture.Initials = GetInitials(user.Name);
+            }
+            
+            UserProfilePicture.DisplayName = user.Name;
+        }
+
+        private string GetInitials(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return "?";
+
+            var parts = name.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length == 1)
+                return parts[0].Substring(0, Math.Min(2, parts[0].Length)).ToUpper();
+
+            return $"{parts[0][0]}{parts[^1][0]}".ToUpper();
         }
     }
 }

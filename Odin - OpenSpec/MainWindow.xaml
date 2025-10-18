@@ -260,6 +260,28 @@
                                BorderThickness="0"
                                VerticalAlignment="Center"
                                ToolTipService.ToolTip="Switch Profile">
+                            <Button.Flyout>
+                                <MenuFlyout x:Name="ProfileSwitcherFlyout" 
+                                           Placement="BottomEdgeAlignedLeft"
+                                           Opening="ProfileSwitcherFlyout_Opening">
+                                    <!-- Profile list will be populated dynamically -->
+                                    <MenuFlyoutItem x:Name="CreateProfileMenuItem"
+                                                   Click="CreateProfile_Click"
+                                                   Icon="AddFriend"
+                                                   Text="Create New Profile" />
+                                    <MenuFlyoutSeparator x:Name="ProfileListSeparator" Visibility="Collapsed" />
+                                    <!-- Dynamic profile items go here -->
+                                    <MenuFlyoutSeparator />
+                                    <MenuFlyoutItem x:Name="EditProfileMenuItem"
+                                                   Click="EditProfile_Click"
+                                                   Icon="Edit"
+                                                   Text="Edit Current Profile" />
+                                    <MenuFlyoutItem x:Name="DeleteProfileMenuItem"
+                                                   Click="DeleteProfile_Click"
+                                                   Icon="Delete"
+                                                   Text="Delete Current Profile" />
+                                </MenuFlyout>
+                            </Button.Flyout>
                             <Button.Resources>
                                 <ResourceDictionary>
                                     <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="{ThemeResource SystemAccentColor}" Opacity="0.1" />
@@ -322,22 +344,7 @@
             
             <!-- Content Area -->
             <Border Grid.Row="1" Style="{StaticResource ContentAreaStyle}">
-                <StackPanel Spacing="16">
-                    <TextBlock x:Name="ContentTitle"
-                              Text="Odin - OpenSpec" 
-                              Style="{StaticResource HeadingTextBlockStyle}" />
-                    
-                    <TextBlock Text="Task 7: Header Implementation - In Progress" 
-                              Style="{StaticResource SubheadingTextBlockStyle}" />
-                    
-                    <Border Style="{StaticResource CardBorderStyle}">
-                        <StackPanel Spacing="12">
-                            <TextBlock x:Name="ContentMessage"
-                                      Text="Welcome to your personal productivity hub!" 
-                                      Style="{StaticResource BodyTextBlockStyle}" />
-                        </StackPanel>
-                    </Border>
-                </StackPanel>
+                <Frame x:Name="ContentFrame" />
             </Border>
         </Grid>
     </Grid>

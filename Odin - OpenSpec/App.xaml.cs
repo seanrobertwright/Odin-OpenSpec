@@ -40,6 +40,11 @@ namespace Odin___OpenSpec
         public new static App Current => (App)Application.Current;
 
         /// <summary>
+        /// Gets the main window.
+        /// </summary>
+        public Window? MainWindow => _window;
+
+        /// <summary>
         /// Gets the service provider for dependency injection.
         /// </summary>
         public ServiceProvider ServiceProvider => _serviceProvider ?? throw new InvalidOperationException("Service provider not initialized");
@@ -96,13 +101,45 @@ namespace Odin___OpenSpec
             {
                 _window = new MainWindow();
                 
-                // Initialize database
+                // Initialize database and restore user session
                 _ = Task.Run(async () =>
                 {
                     try
                     {
                         var dataContext = ServiceProvider.GetRequiredService<IDataContext>();
                         await dataContext.InitializeAsync();
+                        
+                        // Restore last active user on UI thread
+                        _window.DispatcherQueue.TryEnqueue(async () =>
+                        {
+                            try
+                            {
+                                var userService = ServiceProvider.GetRequiredService<IUserService>();
+                                var users = await userService.GetUsersAsync();
+                                
+                                if (users.Any())
+                                {
+                                    // Find the last active user or use the first one
+                                    var lastUser = users.FirstOrDefault(u => u.IsActive) ?? users.First();
+                                    await userService.SetCurrentUserAsync(lastUser.Id);
+                                    
+                                    // Notify MainWindow to update UI
+                                    if (_window is MainWindow mainWindow)
+                                    {
+                                        await mainWindow.RestoreUserSessionAsync();
+                                    }
+                                }
+                                else
+                                {
+                                    // No users - initialize with default user
+                                    await userService.InitializeDefaultUserAsync();
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                System.Diagnostics.Debug.WriteLine($"User session restoration failed: {ex.Message}");
+                            }
+                        });
                     }
                     catch (Exception ex)
                     {
