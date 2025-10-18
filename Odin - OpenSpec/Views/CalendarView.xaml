@@ -37,7 +37,7 @@
                         x:Name="ViewModeComboBox"
                         SelectedIndex="3"
                         SelectionChanged="ViewMode_SelectionChanged"
-                        Width="100">
+                        MinWidth="140">
                         <ComboBoxItem Content="Day"/>
                         <ComboBoxItem Content="Work week"/>
                         <ComboBoxItem Content="Week"/>
@@ -73,7 +73,7 @@
         <!-- Main Content: Sidebar + Calendar Grid -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="300"/>
+                <ColumnDefinition Width="360"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
@@ -92,7 +92,7 @@
                             SelectionMode="Single"
                             SelectedDatesChanged="MiniCalendar_SelectedDatesChanged"
                             HorizontalAlignment="Center"
-                            MaxWidth="280"/>
+                            MaxWidth="320"/>
 
                         <!-- Calendar List -->
                         <StackPanel Spacing="8">

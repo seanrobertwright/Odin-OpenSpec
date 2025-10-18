@@ -10,7 +10,7 @@
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
                 
                 <!-- Common Resource Dictionary -->
-                <ResourceDictionary Source="Themes/Common.xaml" />
+                <ResourceDictionary Source="ms-appx:///Themes/Common.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

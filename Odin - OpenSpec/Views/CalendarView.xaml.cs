@@ -165,6 +165,12 @@ namespace Odin___OpenSpec.Views
                     return;
                 }
 
+                // Show the static day headers for Month view
+                if (DayHeadersGrid != null)
+                {
+                    DayHeadersGrid.Visibility = Visibility.Visible;
+                }
+
                 System.Diagnostics.Debug.WriteLine("Clearing CalendarGrid");
                 CalendarGrid.Children.Clear();
                 CalendarGrid.RowDefinitions.Clear();
@@ -349,6 +355,7 @@ namespace Odin___OpenSpec.Views
                     Padding = new Thickness(6, 3, 6, 3),
                     Margin = new Thickness(2, 1, 2, 1),
                     Height = 22,
+                    HorizontalAlignment = HorizontalAlignment.Stretch, // Fill available width
                     Tag = calEvent // Store event reference
                 };
 
@@ -382,14 +389,15 @@ namespace Odin___OpenSpec.Views
                 };
                 stack.Children.Add(personIcon);
 
-                // Event title (truncated)
+                // Event title (truncated to fit)
                 var titleText = new TextBlock
                 {
                     Text = calEvent.Title ?? "Untitled Event",
                     FontSize = 10,
                     Foreground = new SolidColorBrush(Colors.White),
                     TextTrimming = TextTrimming.CharacterEllipsis,
-                    VerticalAlignment = VerticalAlignment.Center
+                    VerticalAlignment = VerticalAlignment.Center,
+                    MaxWidth = 150 // Prevent overflow
                 };
                 stack.Children.Add(titleText);
 
@@ -420,6 +428,12 @@ namespace Odin___OpenSpec.Views
             try
             {
                 if (CalendarGrid == null || CurrentMonthText == null) return;
+
+                // Hide the static day headers for Day view
+                if (DayHeadersGrid != null)
+                {
+                    DayHeadersGrid.Visibility = Visibility.Collapsed;
+                }
 
                 CalendarGrid.Children.Clear();
                 CalendarGrid.RowDefinitions.Clear();
@@ -576,6 +590,12 @@ namespace Odin___OpenSpec.Views
             {
                 if (CalendarGrid == null || CurrentMonthText == null) return;
 
+                // Hide the static day headers for Week views
+                if (DayHeadersGrid != null)
+                {
+                    DayHeadersGrid.Visibility = Visibility.Collapsed;
+                }
+
                 CalendarGrid.Children.Clear();
                 CalendarGrid.RowDefinitions.Clear();
                 CalendarGrid.ColumnDefinitions.Clear();
@@ -587,15 +607,15 @@ namespace Odin___OpenSpec.Views
 
                 CurrentMonthText.Text = $"{startDay:MMM dd} - {startDay.AddDays(daysToShow - 1):MMM dd, yyyy}";
 
-                // Create columns: Time + Days
-                CalendarGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(60) }); // Time column
+                // Create columns: Time + Days (wider time column)
+                CalendarGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(80) }); // Time column
                 for (int i = 0; i < daysToShow; i++)
                 {
                     CalendarGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
                 }
 
-                // Header row
-                CalendarGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(40) });
+                // Header row (taller for better spacing)
+                CalendarGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(70) });
                 for (int day = 0; day < daysToShow; day++)
                 {
                     var date = startDay.AddDays(day);
@@ -606,20 +626,20 @@ namespace Odin___OpenSpec.Views
                         BorderBrush = (SolidColorBrush?)Application.Current.Resources["CardStrokeColorDefaultBrush"] ?? new SolidColorBrush(Colors.Gray),
                         BorderThickness = new Thickness(1, 0, 0, 1),
                         Background = isToday ? new SolidColorBrush(Colors.DodgerBlue) { Opacity = 0.1 } : null,
-                        Padding = new Thickness(8)
+                        Padding = new Thickness(8, 12, 8, 12)
                     };
 
                     var headerStack = new StackPanel { HorizontalAlignment = HorizontalAlignment.Center };
                     headerStack.Children.Add(new TextBlock
                     {
                         Text = date.ToString("ddd"),
-                        FontSize = 12,
+                        FontSize = 13,
                         Foreground = isToday ? new SolidColorBrush(Colors.DodgerBlue) : (SolidColorBrush?)Application.Current.Resources["TextFillColorPrimaryBrush"] ?? new SolidColorBrush(Colors.Black)
                     });
                     headerStack.Children.Add(new TextBlock
                     {
                         Text = date.Day.ToString(),
-                        FontSize = 16,
+                        FontSize = 18,
                         FontWeight = Microsoft.UI.Text.FontWeights.Bold,
                         Foreground = isToday ? new SolidColorBrush(Colors.DodgerBlue) : (SolidColorBrush?)Application.Current.Resources["TextFillColorPrimaryBrush"] ?? new SolidColorBrush(Colors.Black)
                     });
@@ -643,8 +663,8 @@ namespace Odin___OpenSpec.Views
                         Foreground = (SolidColorBrush?)Application.Current.Resources["TextFillColorSecondaryBrush"] ?? new SolidColorBrush(Colors.Gray),
                         VerticalAlignment = VerticalAlignment.Top,
                         HorizontalAlignment = HorizontalAlignment.Right,
-                        Margin = new Thickness(0, 4, 8, 0),
-                        FontSize = 12
+                        Margin = new Thickness(0, 4, 12, 0),
+                        FontSize = 13
                     };
                     Grid.SetRow(timeLabel, rowIndex);
                     Grid.SetColumn(timeLabel, 0);
@@ -658,7 +678,7 @@ namespace Odin___OpenSpec.Views
                         {
                             BorderBrush = (SolidColorBrush?)Application.Current.Resources["CardStrokeColorDefaultBrush"] ?? new SolidColorBrush(Colors.Gray),
                             BorderThickness = new Thickness(1, 1, 0, 0),
-                            Padding = new Thickness(4)
+                            Padding = new Thickness(4, 2, 4, 2)
                         };
 
                         // Get events for this hour on this day
@@ -669,12 +689,14 @@ namespace Odin___OpenSpec.Views
 
                         if (eventsInSlot.Any())
                         {
-                            var eventStack = new StackPanel { Spacing = 2 };
+                            var eventStack = new StackPanel { Spacing = 2, HorizontalAlignment = HorizontalAlignment.Stretch };
                             foreach (var evt in eventsInSlot.Take(2)) // Show max 2 events per slot
                             {
                                 var eventBar = CreateEventBar(evt);
                                 if (eventBar != null)
                                 {
+                                    // Ensure event bar doesn't overflow
+                                    eventBar.HorizontalAlignment = HorizontalAlignment.Stretch;
                                     eventStack.Children.Add(eventBar);
                                 }
                             }

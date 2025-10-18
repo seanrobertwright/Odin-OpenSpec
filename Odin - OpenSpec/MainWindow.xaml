@@ -134,7 +134,8 @@
                         BorderThickness="0"
                         HorizontalAlignment="Center" />
                 
-                <Button Content="&#xE80F;"
+                <Button x:Name="CollapsedHomeButton"
+                        Content="&#xE80F;"
                         FontFamily="Segoe MDL2 Assets"
                         Width="44"
                         Height="44"
@@ -144,7 +145,8 @@
                         Background="Transparent"
                         BorderThickness="0" />
                 
-                <Button Content="&#xE787;"
+                <Button x:Name="CollapsedCalendarButton"
+                        Content="&#xE787;"
                         FontFamily="Segoe MDL2 Assets"
                         Width="44"
                         Height="44"
@@ -154,7 +156,8 @@
                         Background="Transparent"
                         BorderThickness="0" />
                 
-                <Button Content="&#xE73A;"
+                <Button x:Name="CollapsedTasksButton"
+                        Content="&#xE73A;"
                         FontFamily="Segoe MDL2 Assets"
                         Width="44"
                         Height="44"
@@ -164,7 +167,8 @@
                         Background="Transparent"
                         BorderThickness="0" />
                 
-                <Button Content="&#xE7BF;"
+                <Button x:Name="CollapsedGroceryButton"
+                        Content="&#xE7BF;"
                         FontFamily="Segoe MDL2 Assets"
                         Width="44"
                         Height="44"
@@ -174,7 +178,8 @@
                         Background="Transparent"
                         BorderThickness="0" />
                 
-                <Button Content="&#xE753;"
+                <Button x:Name="CollapsedWeatherButton"
+                        Content="&#xE753;"
                         FontFamily="Segoe MDL2 Assets"
                         Width="44"
                         Height="44"
@@ -184,7 +189,8 @@
                         Background="Transparent"
                         BorderThickness="0" />
                 
-                <Button Content="&#xE8D6;"
+                <Button x:Name="CollapsedMusicButton"
+                        Content="&#xE8D6;"
                         FontFamily="Segoe MDL2 Assets"
                         Width="44"
                         Height="44"
@@ -194,7 +200,8 @@
                         Background="Transparent"
                         BorderThickness="0" />
                 
-                <Button Content="&#xE713;"
+                <Button x:Name="CollapsedSettingsButton"
+                        Content="&#xE713;"
                         FontFamily="Segoe MDL2 Assets"
                         Width="44"
                         Height="44"

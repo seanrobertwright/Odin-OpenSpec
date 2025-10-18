@@ -395,18 +395,44 @@ namespace Odin___OpenSpec
 
         private void UpdateNavigationButtonStates(Button activeButton)
         {
-            // Reset all buttons to default style
-            var buttons = new[] { HomeButton, CalendarButton, TasksButton, GroceryButton, WeatherButton, MusicButton, SettingsButton };
-            foreach (var button in buttons)
+            // Get the Tag to determine which module is active
+            var activeTag = activeButton.Tag as string;
+            
+            // Reset all expanded sidebar buttons to default style
+            var expandedButtons = new[] { HomeButton, CalendarButton, TasksButton, GroceryButton, WeatherButton, MusicButton, SettingsButton };
+            foreach (var button in expandedButtons)
             {
-                // Use ButtonStyle for inactive buttons
                 button.Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
                 button.BorderBrush = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
             }
             
-            // Highlight active button
-            activeButton.Background = (Microsoft.UI.Xaml.Media.Brush)Application.Current.Resources["SystemControlBackgroundAccentBrush"];
-            activeButton.BorderBrush = (Microsoft.UI.Xaml.Media.Brush)Application.Current.Resources["SystemControlForegroundAccentBrush"];
+            // Reset all collapsed sidebar buttons to default style
+            var collapsedButtons = new[] { CollapsedHomeButton, CollapsedCalendarButton, CollapsedTasksButton, CollapsedGroceryButton, CollapsedWeatherButton, CollapsedMusicButton, CollapsedSettingsButton };
+            foreach (var button in collapsedButtons)
+            {
+                button.Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
+                button.BorderBrush = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
+            }
+            
+            // Highlight the active button in both sidebars based on Tag
+            var accentBrush = (Microsoft.UI.Xaml.Media.Brush)Application.Current.Resources["SystemControlBackgroundAccentBrush"];
+            var accentBorderBrush = (Microsoft.UI.Xaml.Media.Brush)Application.Current.Resources["SystemControlForegroundAccentBrush"];
+            
+            // Find and highlight matching expanded button
+            var matchingExpanded = expandedButtons.FirstOrDefault(b => b.Tag as string == activeTag);
+            if (matchingExpanded != null)
+            {
+                matchingExpanded.Background = accentBrush;
+                matchingExpanded.BorderBrush = accentBorderBrush;
+            }
+            
+            // Find and highlight matching collapsed button
+            var matchingCollapsed = collapsedButtons.FirstOrDefault(b => b.Tag as string == activeTag);
+            if (matchingCollapsed != null)
+            {
+                matchingCollapsed.Background = accentBrush;
+                matchingCollapsed.BorderBrush = accentBorderBrush;
+            }
         }
 
         private void UpdateContentArea(string moduleId)
